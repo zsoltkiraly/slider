@@ -3,7 +3,32 @@ Banner slider - Code by Zsolt Király
 v1.0.2 - 2018-03-31
 */
 
+function hasTouch() {
+    return 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+}
+
+if (hasTouch()) {
+    try {
+        for (var si in document.styleSheets) {
+            var styleSheet = document.styleSheets[si];
+            if (!styleSheet.rules) continue;
+
+            for (var ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
+                if (!styleSheet.rules[ri].selectorText) continue;
+
+                if (styleSheet.rules[ri].selectorText.match(':hover')) {
+                    styleSheet.deleteRule(ri);
+                }
+            }
+        }
+    } catch (ex) {}
+}
+
 var slider = function() {
+
+    function getWidth() {
+        return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    }
 
     function sliderWidth(bS) {
         var slider = bS.querySelector('.slider'),
@@ -29,7 +54,6 @@ var slider = function() {
 
         sliderContainer.style.width = sliderFullWidth + 'px';
     }
-
 
     function clone(bS) {
         var slider = bS.querySelector('.slider'),
@@ -63,7 +87,6 @@ var slider = function() {
         sliderUl.style.marginLeft = '-' + slider.offsetWidth + 'px';
     }
 
-
     function setWidthResize(bS) {
         var sliderUl = bS.querySelector('.slider .slider-container ul'),
             sliderLi = sliderUl.querySelector('li.element.active');
@@ -74,13 +97,12 @@ var slider = function() {
         sliderUl.style.marginLeft = '-' + (sliderLiWidth * sliderLiDataId) + 'px';
     }
 
-
     function disabled(disParam, c) {
         disParam.classList.add('disabled-click');
 
         setTimeout(function() {
             disParam.classList.remove('disabled-click');
-        }, c.slideTime);
+        }, c.slideTime + 100);
     }
 
     function navigation(cParam, bS) {
@@ -124,7 +146,7 @@ var slider = function() {
 
                 setTimeout(function() {
                     sliderUl.style.transition = '';
-                }, cParam.slideTime);
+                }, cParam.slideTime + 100);
 
                 var nextElementId = nextElement.getAttribute('data-id');
                 var activeElementId = sliderLiActive.getAttribute('data-id');
@@ -166,7 +188,7 @@ var slider = function() {
 
                         sliderUl.style.marginLeft = '-' + slider.offsetWidth + 'px';
 
-                    }, cParam.slideTime);
+                    }, cParam.slideTime + 100);
 
                 } else {
 
@@ -207,7 +229,7 @@ var slider = function() {
 
                             sliderUl.style.marginLeft = '-' + slider.offsetWidth + 'px';
 
-                        }, cParam.slideTime);
+                        }, cParam.slideTime + 100);
                     }
                 }
             }
@@ -248,7 +270,7 @@ var slider = function() {
 
                 setTimeout(function() {
                     sliderUl.style.transition = '';
-                }, cParam.slideTime);
+                }, cParam.slideTime + 100);
 
                 var previousElementId = previousElement.getAttribute('data-id');
                 var activeElementId = sliderLiActive.getAttribute('data-id');
@@ -285,7 +307,7 @@ var slider = function() {
                         sliderLi[sliderLi.length - 2].classList.add('active');
 
                         sliderUl.style.marginLeft = '-' + (slider.offsetWidth * (sliderLi.length - 2)) + 'px';
-                    }, cParam.slideTime);
+                    }, cParam.slideTime + 100);
                 }
 
                 if (sliderUlGet == sliderLiWidth) {
@@ -320,10 +342,16 @@ var slider = function() {
             }
         }, false);
 
+        var cachedWidth = getWidth();
+
         window.addEventListener('resize', function() {
-            if (cParam.autoPlay == true) {
-                clearInterval(autoplay);
-                autoplay = setInterval(nextSlide, cParam.playTime);
+            var newWidth = getWidth();
+
+            if(newWidth !== cachedWidth) {
+                if (cParam.autoPlay == true) {
+                    clearInterval(autoplay);
+                    autoplay = setInterval(nextSlide, cParam.playTime);
+                }
             }
         }, false);
 
@@ -332,80 +360,93 @@ var slider = function() {
         var sliderUl = sliderBox.querySelector('.slider-container ul'),
             sliderLi = sliderUl.querySelectorAll('li'),
             startx = 0,
-            dist = 0;
-
+            starty = 0,
+            distx = 0,
+            disty = 0,
+            gap = 15,
+            yMax = 15;
 
         if (sliderBox) {
-
             sliderBox.addEventListener('touchstart', function(e) {
                 var touchobj = e.changedTouches[0];
-                startx = parseInt(touchobj.clientX);
+                    startx = parseInt(touchobj.clientX);
+                    starty = parseInt(touchobj.clientY);
 
                 sliderUlGet = (parseFloat(sliderUl.style.marginLeft, 10) * -1);
                 sliderLiWidth = parseFloat(sliderLi[0].style.width, 10);
-
-                if (cParam.autoPlay == true) {
-                    clearInterval(autoplay);
-                    autoplay = setInterval(nextSlide, cParam.playTime);
-                }
-
             }, false);
 
-
             sliderBox.addEventListener('touchmove', function(e) {
-                var touchobj = e.changedTouches[0];
-                var dist = parseInt(touchobj.clientX) - startx;
+                var touchobj = e.changedTouches[0],
+                    distx = parseInt(touchobj.clientX) - startx,
+                    disty = parseInt(touchobj.clientY) - starty;
 
-                if (sliderUlGet == (sliderLiWidth * sliderLi.length - (sliderLiWidth))) {
-
-                    sliderUl.style.marginLeft = '-' + (sliderUlGet - dist) + 'px';
-
-                } else {
-
-                    if (sliderUlGet == sliderLiWidth) {
-
-                        sliderUl.style.marginLeft = '-' + (sliderUlGet - dist) + 'px';
+                function gapSlide(d) {
+                    if (sliderUlGet == (sliderLiWidth * sliderLi.length - (sliderLiWidth))) {
+                        sliderUl.style.marginLeft = '-' + (sliderUlGet - d) + 'px';
 
                     } else {
-                        sliderUl.style.marginLeft = '-' + (sliderUlGet - dist) + 'px';
+
+                        if (sliderUlGet == sliderLiWidth) {
+                            sliderUl.style.marginLeft = '-' + (sliderUlGet - d) + 'px';
+
+                        } else {
+                            sliderUl.style.marginLeft = '-' + (sliderUlGet - d) + 'px';
+                        }
                     }
                 }
 
-                if (cParam.autoPlay == true) {
-                    clearInterval(autoplay);
-                    autoplay = setInterval(nextSlide, cParam.playTime);
-                }
+                if(distx > gap*1.5 && Math.abs(disty) < yMax) {
+                    distx = parseInt(touchobj.clientX) - gap - startx;
 
+                    gapSlide(distx);
+
+                } else if(distx < -gap*1.5 && Math.abs(disty) < yMax) {
+                    distx = parseInt(touchobj.clientX) + gap - startx;
+
+                    gapSlide(distx);
+                }
             }, false);
 
-
             sliderBox.addEventListener('touchend', function(e) {
+                var touchobj = e.changedTouches[0],
+                    distx = parseInt(touchobj.clientX) - startx,
+                    disty = parseInt(touchobj.clientY) - starty;
 
-                var touchobj = e.changedTouches[0];
-                var dist = parseInt(touchobj.clientX) - startx;
+                if (distx > gap*1.5 && Math.abs(disty) < yMax) {
+                    distx = distx - gap;
+                    prevSlide(distx);
 
-                if (dist > 50) {
-                    prevSlide(dist);
+                    if (cParam.autoPlay == true) {
+                        clearInterval(autoplay);
+                        autoplay = setInterval(nextSlide, cParam.playTime);
+                    }
 
-                } else if (dist < -50) {
-                    nextSlide(dist);
+                } else if (distx < -gap*1.5 && Math.abs(disty) < yMax) {
+                    distx = distx + gap;
+                    nextSlide(distx);
+
+                    if (cParam.autoPlay == true) {
+                        clearInterval(autoplay);
+                        autoplay = setInterval(nextSlide, cParam.playTime);
+                    }
 
                 } else {
+
+                    var slider = bS.querySelector('.slider')
+                        sliderUl = slider.querySelector('.slider-container ul')
+                        sliderLiActive = sliderUl.querySelector('li.element.active');
+
+                    var sliderActiveDistance = parseFloat(sliderLiActive.getAttribute('data-id'), 10) * parseFloat(sliderLiActive.style.width, 10);
 
                     sliderUl.style.transition = 'all ' + cParam.slideTime + 'ms';
 
                     setTimeout(function() {
                         sliderUl.style.transition = '';
-                    }, cParam.slideTime);
+                    }, cParam.slideTime + 100);
 
-                    sliderUl.style.marginLeft = '-' + sliderUlGet + 'px';
+                    sliderUl.style.marginLeft = '-' + sliderActiveDistance + 'px';
                 }
-
-                if (cParam.autoPlay == true) {
-                    clearInterval(autoplay);
-                    autoplay = setInterval(nextSlide, cParam.playTime);
-                }
-
             }, false);
         }
 
@@ -477,7 +518,7 @@ var slider = function() {
 
                         setTimeout(function() {
                             sliderUl.style.transition = '';
-                        }, cParam.slideTime);
+                        }, cParam.slideTime + 100);
 
                     } else {
                         dotsList.classList.remove('active');
@@ -509,10 +550,18 @@ var slider = function() {
                 sliderWidth(bannerSlider);
                 navigation(config, bannerSlider);
 
+                var cachedWidth = getWidth();
+
                 window.addEventListener('resize', function() {
-                    sliderWidth(bannerSlider);
-                    setWidthResize(bannerSlider);
+                    var newWidth = getWidth();
+
+                    if(newWidth !== cachedWidth) {
+                        sliderWidth(bannerSlider);
+                        setWidthResize(bannerSlider);
+                    }
                 }, false);
+
+
             }
         }
 
