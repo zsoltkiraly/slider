@@ -1,7 +1,7 @@
 # Slider v1.0.2
 
 <br />
-<a href="http://zsoltkiraly.com/developments/slider/" target="_blank">DEMO PAGE</a>
+<a href="https://zsoltkiraly.com/developments/slider/" target="_blank">DEMO PAGE</a>
 
 #
 <br />
