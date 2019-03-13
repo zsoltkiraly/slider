@@ -3,6 +3,15 @@
 <br />
 <a href="https://zsoltkiraly.com/developments/slider/" target="_blank">DEMO PAGE</a>
 
+<img src="http://zsoltkiraly.com/developments/_images/slider-001.jpg">
+
+## SLIDER FUNCTIONS
+
+- autoPlay on/off
+- playTime edit
+- slideTime edit
+
+
 #
 <br />
 
