@@ -2,51 +2,51 @@
 Banner slider - Code by Zsolt Király
 v1.0.2 - 2018-03-31
 */
-
-function hasTouch() {
-    return 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-}
-
-if (hasTouch()) {
-    try {
-        for (var si in document.styleSheets) {
-            var styleSheet = document.styleSheets[si];
-            if (!styleSheet.rules) continue;
-
-            for (var ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
-                if (!styleSheet.rules[ri].selectorText) continue;
-
-                if (styleSheet.rules[ri].selectorText.match(':hover')) {
-                    styleSheet.deleteRule(ri);
-                }
-            }
+function signatura() {
+    if (window['console']) {
+        const text = {
+            black: '%c     ',
+            blue: '%c   ',
+            author: '%c  Zsolt Király  ',
+            github: '%c  https://zsoltkiraly.com/'
         }
-    } catch (ex) {}
+
+        const style = {
+            black: 'background: #282c34',
+            blue: 'background: #61dafb',
+            author: 'background: black; color: white',
+            github: ''
+        }
+
+        console.log(text.black + text.blue + text.author + text.github, style.black, style.blue, style.author, style.github);
+    }
 }
 
+signatura();
+
+'use strict';
 var slider = function() {
 
-    function signatura() {
-        if (window['console']) {
-            const text = {
-                black: '%c     ',
-                blue: '%c   ',
-                author: '%c  Zsolt Király  ',
-                github: '%c  https://zsoltkiraly.com/'
-            }
-
-            const style = {
-                black: 'background: #282c34',
-                blue: 'background: #61dafb',
-                author: 'background: black; color: white',
-                github: ''
-            }
-
-            console.log(text.black + text.blue + text.author + text.github, style.black, style.blue, style.author, style.github);
-        }
+    function hasTouch() {
+        return 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     }
-
-    signatura();
+    
+    if (hasTouch()) {
+        try {
+            for (var si in document.styleSheets) {
+                var styleSheet = document.styleSheets[si];
+                if (!styleSheet.rules) continue;
+    
+                for (var ri = styleSheet.rules.length - 1; ri >= 0; ri--) {
+                    if (!styleSheet.rules[ri].selectorText) continue;
+    
+                    if (styleSheet.rules[ri].selectorText.match(':hover')) {
+                        styleSheet.deleteRule(ri);
+                    }
+                }
+            }
+        } catch (ex) {}
+    }
 
     function getWidth() {
         return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -170,7 +170,6 @@ var slider = function() {
                     sliderUl.style.transition = '';
                 }, cParam.slideTime + 100);
 
-                var nextElementId = nextElement.getAttribute('data-id');
                 var activeElementId = sliderLiActive.getAttribute('data-id');
 
                 var i = 0,
@@ -294,7 +293,6 @@ var slider = function() {
                     sliderUl.style.transition = '';
                 }, cParam.slideTime + 100);
 
-                var previousElementId = previousElement.getAttribute('data-id');
                 var activeElementId = sliderLiActive.getAttribute('data-id');
 
                 var i = 0,
@@ -310,7 +308,6 @@ var slider = function() {
                         dotsUlLis.previousElementSibling.classList.add('active');
                     }
                 }
-
             } else {
 
                 function setLast() {
@@ -338,7 +335,6 @@ var slider = function() {
                 } else {
                     setLast();
                 }
-
             }
         }
 
@@ -390,18 +386,22 @@ var slider = function() {
 
         if (sliderBox) {
             sliderBox.addEventListener('touchstart', function(e) {
+
                 var touchobj = e.changedTouches[0];
-                    startx = parseInt(touchobj.clientX);
-                    starty = parseInt(touchobj.clientY);
+
+                startx = parseInt(touchobj.clientX);
+                starty = parseInt(touchobj.clientY);
 
                 sliderUlGet = (parseFloat(sliderUl.style.marginLeft, 10) * -1);
                 sliderLiWidth = parseFloat(sliderLi[0].style.width, 10);
             }, false);
 
             sliderBox.addEventListener('touchmove', function(e) {
-                var touchobj = e.changedTouches[0],
-                    distx = parseInt(touchobj.clientX) - startx,
-                    disty = parseInt(touchobj.clientY) - starty;
+
+                var touchobj = e.changedTouches[0];
+
+                distx = parseInt(touchobj.clientX) - startx,
+                disty = parseInt(touchobj.clientY) - starty;
 
                 function gapSlide(d) {
                     if (sliderUlGet == (sliderLiWidth * sliderLi.length - (sliderLiWidth))) {
@@ -431,9 +431,11 @@ var slider = function() {
             }, false);
 
             sliderBox.addEventListener('touchend', function(e) {
-                var touchobj = e.changedTouches[0],
-                    distx = parseInt(touchobj.clientX) - startx,
-                    disty = parseInt(touchobj.clientY) - starty;
+
+                var touchobj = e.changedTouches[0];
+                
+                distx = parseInt(touchobj.clientX) - startx,
+                disty = parseInt(touchobj.clientY) - starty;
 
                 if (distx > gap*1.5 && Math.abs(disty) < yMax) {
                     distx = distx - gap;
@@ -446,9 +448,11 @@ var slider = function() {
 
                 } else if (distx < -gap*1.5 && Math.abs(disty) < yMax) {
                     distx = distx + gap;
+
                     nextSlide(distx);
 
                     if (cParam.autoPlay == true) {
+
                         clearInterval(autoplay);
                         autoplay = setInterval(nextSlide, cParam.playTime);
                     }
@@ -557,11 +561,10 @@ var slider = function() {
             setTimeout(function() {
                 container.classList.remove('loading');
             }, 500);
-
         }, 500);
     }
 
-    function app() {
+    function app(config) {
 
         var bannerSlider = document.querySelector('#' + config.contentBox + ''),
             len = bannerSlider.querySelectorAll('.slider .slider-container ul li').length;
@@ -582,16 +585,12 @@ var slider = function() {
                         setWidthResize(bannerSlider);
                     }
                 }, false);
-
-
             }
         }
-
         loading(bannerSlider);
     }
 
     return {
         app: app
     }
-
 }();

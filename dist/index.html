@@ -5,9 +5,10 @@
     <title>Slider v1.0.2 by Zsolt Kiraly</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8">
-    <link rel="stylesheet" href="css/demo.css">
+
+    <link rel="shortcut icon" href="#" />
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/scripts.js"></script>
+    <script src="js/scripts.min.js"></script>
 </head>
 
 <body>
@@ -81,15 +82,13 @@
     </section>
 
     <script type="text/javascript">
-        window.addEventListener('load', function() {
-            slider.app(
-                config = {
-                    contentBox: 'banner-slider-1',
-                    autoPlay: true,
-                    playTime: 5000,
-                    slideTime: 400
-                }
-            );
+        window.addEventListener('load', ()=> {
+            slider.app({
+                contentBox: 'banner-slider-1',
+                autoPlay: true,
+                playTime: 5000,
+                slideTime: 400
+            });
         }, false);
     </script>
 
@@ -158,15 +157,13 @@
     </section>
 
     <script type="text/javascript">
-        window.addEventListener('load', function() {   
-            slider.app(
-                config = {
-                    contentBox: 'banner-slider-2',
-                    autoPlay: false,
-                    playTime: 4000,
-                    slideTime: 600
-                }
-            );
+        window.addEventListener('load', ()=> {   
+            slider.app({
+                contentBox: 'banner-slider-2',
+                autoPlay: false,
+                playTime: 4000,
+                slideTime: 600
+            });
         }, false);
     </script>
 
